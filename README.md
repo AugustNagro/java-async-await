@@ -10,8 +10,8 @@ CompletableFuture<byte[]> pdfForUsers = async((AsyncContext ctx) -> {
   List<Long> userIds = ctx.await(userIdsFromDb());
 
   List<String> userNames = userIds.stream()
-  .map(id -> ctx.await(userNamesFromSomeApi(id)))
-  .toList();
+    .map(id -> ctx.await(userNamesFromSomeApi(id)))
+    .toList();
 
   byte[] pdf = ctx.await(buildPdf(userNames));
   
@@ -23,7 +23,7 @@ CompletableFuture<byte[]> pdfForUsers = async((AsyncContext ctx) -> {
 vs.
 
 ```java
-CompletionStage<byte[]> userPdf = userIdsFromDb().thenCompose(userIds -> {
+CompletionStage<byte[]> pdfForUsers = userIdsFromDb().thenCompose(userIds -> {
 
   // note that we could flood the api here by starting all futures at once!
   List<CompletableFuture<String>> userNameFutures = userIds.stream()
@@ -57,32 +57,33 @@ CompletionStage<byte[]> userPdf = userIdsFromDb().thenCompose(userIds -> {
 </dependency>
 ```
 
-This library requires the latest [JDK 18 Loom Preview Build](http://jdk.java.net/loom/) and depends on `vertx-core` v. 4.1.5.
+This library requires the latest [JDK 18 Loom Preview Build](http://jdk.java.net/loom/) and has no dependencies.
 
 ## Docs:
 
-Within an `async` scope, you can `await` CompletionStages (which most Future types extend or convert to) and program in an imperative style. `async` and `await` calls can be nested to any depth.
+Within an `async` scope, you can `await` CompletionStages and program in an imperative style. Most Future apis implement CompletionStage, or provide conversions. `async` and `await` calls can be nested to any depth.
 
-## Why Async-Await vs the CompletableFuture higher-order-function API?
+## Why Async-Await vs the higher-order Future API?
 
 Abstractions like Future, Rx, ZIO, Uni, etc, are great. They provide convenient functions, like handling timeout and retries.
 
 However, there are serious downsides to implementing your code in a fully 'monadic' style:
 
 * Often it's difficult to express something with Futures, when it is trivial with simple blocking code. 
-* `flatMap` and its aliases like `thenCompose` are generally not stack-safe, and will StackOverflow if you recurse far enough (see unit tests for an example).
+* `flatMap` and its aliases like `thenCompose` are generally not stack-safe, and will StackOverflow if you recurse far enough (see unit tests for example).
 * It's hard to debug big Future chains in IDEs
 * Stack traces are often meaningless.
+* Future is 'viral', infecting your codebase.
 
-Project Loom solves all four issues.
+Project Loom solves all five issues, although Async-Await only solves the first 3. Stack traces are significantly better then using higher-order functions, but can still lack detail in certain cases. Since `async` returns `CompletableFuture`, it retains the virility of Future-like apis.
 
-## Why Async-Await vs using synchronous APIs on Virtual Threads and dropping async APIs entirely?
+## Why Async-Await vs synchronous APIs on Virtual Threads and dropping async entirely?
 
-* You lose concurrency features like timeouts and retry offered by abstractions like Rx, Uni, etc.
+* You lose the concurrency features like timeout and retry offered by Rx, Uni, ZIO, etc.
 * Maybe you're already using Async libraries; the effort to migrate back to sync is gigantic, whereas introducing Async-Await can be done incrementally.
-* Async library authors care more about performance; regardless of concurrency, these libraries are faster and higher quality.
+* Async library authors care more about performance; regardless of concurrency, these libraries are faster and higher quality. For example, it will take years of effort for a synchronous library to achieve performance parity with something like [Netty](https://github.com/netty/netty).
 
-## Alternatives
+## Alternative Approaches
 
 * Java bytecode manipulation: https://github.com/electronicarts/ea-async
 * Scala 3 Async-Await macro: https://github.com/rssh/dotty-cps-async
