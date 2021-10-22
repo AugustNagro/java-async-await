@@ -8,6 +8,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 
 import static com.augustnagro.jaa.Async.async;
+import static com.augustnagro.jaa.Async.await;
 import static org.junit.Assert.assertEquals;
 
 public class UnitTests {
@@ -26,14 +27,14 @@ public class UnitTests {
 
   @Test
   public void testSimpleAsyncAwait() {
-    CompletableFuture<byte[]> future = async(ctx -> {
-      List<Long> userIds = ctx.await(userIdsFromDb());
+    CompletableFuture<byte[]> future = async(() -> {
+      List<Long> userIds = await(userIdsFromDb());
 
       List<String> userNames = userIds.stream()
-        .map(id -> ctx.await(userNamesFromSomeApi(id)))
+        .map(id -> await(userNamesFromSomeApi(id)))
         .toList();
 
-      byte[] pdf = ctx.await(buildPdf(userNames));
+      byte[] pdf = await(buildPdf(userNames));
 
       System.out.println("Generated pdf for user ids: " + userIds);
       return pdf;
@@ -73,9 +74,9 @@ public class UnitTests {
 
   @Test
   public void testAwaitNesting() {
-    Future<Integer> future = async(ctx -> {
-      List<Long> ids1 = ctx.await(userIdsFromDb());
-      List<Long> ids2 = ctx.await(async(ctx1 -> ctx1.await(userIdsFromDb())));
+    Future<Integer> future = async(() -> {
+      List<Long> ids1 = await(userIdsFromDb());
+      List<Long> ids2 = await(async(() -> await(userIdsFromDb())));
 
       return ids1.size() + ids2.size();
     });
@@ -85,10 +86,10 @@ public class UnitTests {
 
   @Test
   public void testAwaitForLoop() {
-    Future<String> future = async(ctx -> {
+    Future<String> future = async(() -> {
       ArrayList<String> userNames = new ArrayList<>();
       for (long userId = 1; userId <= 1000; ++userId) {
-        userNames.add(ctx.await(userNamesFromSomeApi(userId)));
+        userNames.add(await(userNamesFromSomeApi(userId)));
       }
 
       return userNames.get(userNames.size() - 1);
@@ -107,12 +108,12 @@ public class UnitTests {
   }
 
   private CompletableFuture<Long> recurseAsync(long iterations, long result) {
-    return async(ctx -> {
+    return async(() -> {
       if (iterations == 0) {
         return result;
       } else {
-        Long newResult = ctx.await(calculateNewResult(result));
-        return ctx.await(recurseAsync(iterations - 1, newResult));
+        Long newResult = await(calculateNewResult(result));
+        return await(recurseAsync(iterations - 1, newResult));
       }
     });
   }

@@ -8,12 +8,11 @@ import java.util.concurrent.locks.ReentrantLock;
  * Must be run in a Virtual Thread, so that blocking until the
  * CompletionStage completes does not degrade performance.
  */
-class Coroutine implements AsyncContext {
+class Coroutine {
 
   private final ReentrantLock lock = new ReentrantLock();
   private final Condition cond = lock.newCondition();
 
-  @Override
   public <A> A await(CompletionStage<A> stage) {
     lock.lock();
     try {

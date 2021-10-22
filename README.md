@@ -5,15 +5,16 @@ Async-Await support for Java [CompletionStage](https://download.java.net/java/ea
 ```java
 import com.augustnagro.jaa.AsyncContext;
 import static com.augustnagro.jaa.Async.async;
+import static com.augustnagro.jaa.Async.await;
 
-CompletableFuture<byte[]> pdfForUsers = async((AsyncContext ctx) -> {
-  List<Long> userIds = ctx.await(userIdsFromDb());
+CompletableFuture<byte[]> pdfForUsers = async(() -> {
+  List<Long> userIds = await(userIdsFromDb());
 
   List<String> userNames = userIds.stream()
-    .map(id -> ctx.await(userNamesFromSomeApi(id)))
+    .map(id -> await(userNamesFromSomeApi(id)))
     .toList();
 
-  byte[] pdf = ctx.await(buildPdf(userNames));
+  byte[] pdf = await(buildPdf(userNames));
   
   System.out.println("Generated pdf for user ids: " + userIds);
   return pdf;
@@ -53,7 +54,7 @@ CompletionStage<byte[]> pdfForUsers = userIdsFromDb().thenCompose(userIds -> {
 <dependency>
   <groupId>com.augustnagro</groupId>
   <artifactId>java-async-await</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
 </dependency>
 ```
 
@@ -67,7 +68,7 @@ Within an `async` scope, you can `await` CompletionStages and program in an impe
 
 Abstractions like Future, Rx, ZIO, Uni, etc, are great. They provide convenient functions, like handling timeout and retries.
 
-However, there are serious downsides to implementing your code in a fully 'monadic' style:
+However, there are serious downsides to implementing business logic in a fully 'monadic' style:
 
 * Often it's difficult to express something with Futures, when it is trivial with simple blocking code. 
 * `flatMap` and its aliases like `thenCompose` are generally not stack-safe, and will StackOverflow if you recurse far enough (see unit tests for example).
@@ -83,9 +84,12 @@ Project Loom solves all five issues, although Async-Await only solves the first 
 * Maybe you're already using Async libraries; the effort to migrate back to sync is gigantic, whereas introducing Async-Await can be done incrementally.
 * Async library authors care more about performance; regardless of concurrency, these libraries are faster and higher quality. For example, it will take years of effort for a synchronous library to achieve performance parity with something like [Netty](https://github.com/netty/netty).
 
+## See Also
+An optimized implementation for Vertx: https://github.com/AugustNagro/vertx-async-await
+
 ## Alternative Approaches
 
 * Java bytecode manipulation: https://github.com/electronicarts/ea-async
 * Scala 3 Async-Await macro: https://github.com/rssh/dotty-cps-async
-* Scala 3 Monadic Reflection: https://github.com/lampepfl/monadic-reflection
+* Scala 3 Monadic Reflection using Loom: https://github.com/lampepfl/monadic-reflection
 * Kotlin Coroutines (another form of bytecode manipulation)
