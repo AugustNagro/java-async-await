@@ -82,7 +82,6 @@ Project Loom solves all five issues, although Async-Await only solves the first 
 
 * You lose the concurrency features like timeout and retry offered by Rx, Uni, ZIO, etc.
 * Maybe you're already using Async libraries; the effort to migrate back to sync is gigantic, whereas introducing Async-Await can be done incrementally.
-* Async library authors care more about performance; regardless of concurrency, these libraries are faster and higher quality. For example, it will take years of effort for a synchronous library to achieve performance parity with something like [Netty](https://github.com/netty/netty).
 
 ## See Also
 An optimized implementation for Vertx: https://github.com/AugustNagro/vertx-async-await
