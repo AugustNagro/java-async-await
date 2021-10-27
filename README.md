@@ -24,27 +24,27 @@ CompletableFuture<byte[]> pdfForUsers = async(() -> {
 vs.
 
 ```java
-CompletionStage<byte[]> pdfForUsers = userIdsFromDb().thenCompose(userIds -> {
+CompletionStage<byte[]> userPdf = userIdsFromDb().thenCompose(userIds -> {
 
-  // note that we could flood the api here by starting all futures at once!
-  List<CompletableFuture<String>> userNameFutures = userIds.stream()
-    .map(id -> userNamesFromSomeApi(id))
-    .map(CompletionStage::toCompletableFuture)
-    .toList();
+  CompletionStage<List<String>> userNamesFuture =
+    CompletableFuture.supplyAsync(ArrayList::new);
 
-  return CompletableFuture.allOf(userNameFutures.toArray(new CompletableFuture[0]))
-    .thenCompose(voidd -> {
-
-      List<String> userNames = userNameFutures.stream()
-        .map(CompletableFuture::join)
-        .toList();
-
-      return buildPdf(userNames)
-        .thenApply(pdf -> {
-          System.out.println("Generated pdf for user ids: " + userIds);
-          return pdf;
+  for (Long userId : userIds) {
+    userNamesFuture = userNamesFuture.thenCompose(list -> {
+      return userNamesFromSomeApi(userId)
+        .thenApply(userName -> {
+          list.add(userName);
+          return list;
         });
     });
+  }
+
+  return userNamesFuture.thenCompose(userNames -> {
+    return buildPdf(userNames).thenApply(pdf -> {
+      System.out.println("Generated pdf for user ids: " + userIds);
+      return pdf;
+    });
+  });
 });
 ```
 
