@@ -18,8 +18,8 @@ public class Async {
         AWAIT_CONTEXT.set(new Coroutine());
         promise.complete(fn.call());
         AWAIT_CONTEXT.remove();
-      } catch (Exception e) {
-        promise.completeExceptionally(e);
+      } catch (Throwable t) {
+        promise.completeExceptionally(t);
       }
     });
     return promise;
