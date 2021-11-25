@@ -14,7 +14,7 @@ CompletableFuture<byte[]> pdfForUsers = async(() -> {
     .map(id -> await(userNamesFromSomeApi(id)))
     .toList();
 
-  byte[] pdf = await(buildPdf(userNames));
+  byte[] pdf = await(buildPdf(userNames));  //buildPdf returns CompletableFuture<byte[]>
   
   System.out.println("Generated pdf for user ids: " + userIds);
   return pdf;
