@@ -58,7 +58,7 @@ CompletionStage<byte[]> userPdf = userIdsFromDb().thenCompose(userIds -> {
 </dependency>
 ```
 
-This library requires the latest [JDK 18 Loom Preview Build](http://jdk.java.net/loom/) and has no dependencies.
+This library requires the latest [JDK 19 Build](https://www.oracle.com/java/technologies/downloads/#java19) and has no dependencies. See also [Thread.html#virtual-threads](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Thread.html#virtual-threads).
 
 ## Docs:
 
