@@ -58,7 +58,7 @@ CompletionStage<byte[]> userPdf = userIdsFromDb().thenCompose(userIds -> {
 </dependency>
 ```
 
-This library requires the latest [JDK 18 Loom Preview Build](http://jdk.java.net/loom/) and has no dependencies.
+This library requires [JDK 19](https://jdk.java.net/19/) with `--enable-preview`, and has no dependencies.
 
 ## Docs:
 
@@ -80,6 +80,7 @@ Project Loom solves all five issues, although Async-Await only solves the first 
 
 ## Why Async-Await vs synchronous APIs on Virtual Threads and dropping async entirely?
 
+* That's not a bad idea.
 * You lose the concurrency features like timeout and retry offered by Rx, Uni, ZIO, etc.
 * Maybe you're already using Async libraries; the effort to migrate back to sync is gigantic, whereas introducing Async-Await can be done incrementally.
 

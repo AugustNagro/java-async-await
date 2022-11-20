@@ -13,13 +13,14 @@ public class Async {
 
   public static <A> CompletableFuture<A> async(Callable<A> fn) {
     CompletableFuture<A> promise = new CompletableFuture<>();
-    Thread.ofVirtual().start(() -> {
+    Thread.startVirtualThread(() -> {
       try {
         AWAIT_CONTEXT.set(new Coroutine());
         promise.complete(fn.call());
-        AWAIT_CONTEXT.remove();
       } catch (Throwable t) {
         promise.completeExceptionally(t);
+      } finally {
+        AWAIT_CONTEXT.remove();
       }
     });
     return promise;

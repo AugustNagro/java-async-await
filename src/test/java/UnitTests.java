@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static com.augustnagro.jaa.Async.async;
@@ -73,7 +74,7 @@ public class UnitTests {
 
 
   @Test
-  public void testAwaitNesting() {
+  public void testAwaitNesting() throws ExecutionException, InterruptedException {
     Future<Integer> future = async(() -> {
       List<Long> ids1 = await(userIdsFromDb());
       List<Long> ids2 = await(async(() -> await(userIdsFromDb())));
@@ -81,11 +82,11 @@ public class UnitTests {
       return ids1.size() + ids2.size();
     });
 
-    assertEquals(6L, future.join().longValue());
+    assertEquals(6L, future.get().longValue());
   }
 
   @Test
-  public void testAwaitForLoop() {
+  public void testAwaitForLoop() throws ExecutionException, InterruptedException {
     Future<String> future = async(() -> {
       ArrayList<String> userNames = new ArrayList<>();
       for (long userId = 1; userId <= 1000; ++userId) {
@@ -95,7 +96,7 @@ public class UnitTests {
       return userNames.get(userNames.size() - 1);
     });
 
-    assertEquals("User 1000", future.join());
+    assertEquals("User 1000", future.get());
   }
 
   private static final long RECURSE_ITERATIONS = 20_000;
