@@ -54,11 +54,11 @@ CompletionStage<byte[]> userPdf = userIdsFromDb().thenCompose(userIds -> {
 <dependency>
   <groupId>com.augustnagro</groupId>
   <artifactId>java-async-await</artifactId>
-  <version>0.2.1</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 
-This library requires [JDK 19](https://jdk.java.net/19/) with `--enable-preview`, and has no dependencies.
+This library requires [JDK 20](https://jdk.java.net/20/) with `--enable-preview`, and has no dependencies.
 
 ## Docs:
 
@@ -83,9 +83,6 @@ Project Loom solves all five issues, although Async-Await only solves the first 
 * That's not a bad idea.
 * You lose the concurrency features like timeout and retry offered by Rx, Uni, ZIO, etc.
 * Maybe you're already using Async libraries; the effort to migrate back to sync is gigantic, whereas introducing Async-Await can be done incrementally.
-
-## See Also
-An optimized implementation for Vertx: https://github.com/AugustNagro/vertx-async-await
 
 ## Alternative Approaches
 

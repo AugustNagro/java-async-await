@@ -6,7 +6,7 @@
 
   <groupId>com.augustnagro</groupId>
   <artifactId>java-async-await</artifactId>
-  <version>0.2.1</version>
+  <version>0.3.0</version>
 
   <name>Java Async-Await</name>
   <description>Async-Await support for Java</description>
@@ -67,7 +67,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <release>19</release>
+          <release>20</release>
           <compilerArgs>
             <compilerArg>--enable-preview</compilerArg>
           </compilerArgs>
