@@ -6,7 +6,7 @@
 
   <groupId>com.augustnagro</groupId>
   <artifactId>java-async-await</artifactId>
-  <version>0.3.0</version>
+  <version>0.3.1-SNAPSHOT</version>
 
   <name>Java Async-Await</name>
   <description>Async-Await support for Java</description>
